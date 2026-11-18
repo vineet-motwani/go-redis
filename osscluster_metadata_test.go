@@ -1927,6 +1927,11 @@ func TestClusterMetadataRefreshesOnNodeReconnect(t *testing.T) {
 		{name: "Static Dynamic HELLO fallback", protocol: 2, rejectHello: true, dynamic: true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			if tc.rejectHello {
+				oldVerifyInterval := cmdMetaVerifyInterval
+				cmdMetaVerifyInterval = 50 * time.Millisecond
+				t.Cleanup(func() { cmdMetaVerifyInterval = oldVerifyInterval })
+			}
 			var phases, fetches [2]atomic.Int32
 			var addrs []string
 			for i := range phases {
